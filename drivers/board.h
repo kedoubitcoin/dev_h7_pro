@@ -52,7 +52,6 @@ extern "C"
 //#define SCB_EnableICache
 //#define SCB_EnableDCache
 #define BSP_USING_SDRAM
-//#define RT_USING_MEMHEAP_AS_HEAP
 
 /*--------------------------jjj CONFIG END------------------------------*/
 
