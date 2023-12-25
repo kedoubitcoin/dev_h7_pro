@@ -322,7 +322,7 @@ static const struct pin_index *get_pin(uint8_t pin)
     return index;
 };
 
-static void stm32_pin_write(rt_device_t dev, rt_base_t pin, rt_base_t value)
+static void stm32_pin_write(rt_device_t dev, rt_base_t pin, rt_uint8_t value)
 {
     const struct pin_index *index;
 
@@ -335,7 +335,7 @@ static void stm32_pin_write(rt_device_t dev, rt_base_t pin, rt_base_t value)
     HAL_GPIO_WritePin(index->gpio, index->pin, (GPIO_PinState)value);
 }
 
-static int stm32_pin_read(rt_device_t dev, rt_base_t pin)
+static rt_int8_t stm32_pin_read(rt_device_t dev, rt_base_t pin)
 {
     int value;
     const struct pin_index *index;
@@ -353,7 +353,7 @@ static int stm32_pin_read(rt_device_t dev, rt_base_t pin)
     return value;
 }
 
-static void stm32_pin_mode(rt_device_t dev, rt_base_t pin, rt_base_t mode)
+static void stm32_pin_mode(rt_device_t dev, rt_base_t pin, rt_uint8_t mode)
 {
     const struct pin_index *index;
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -427,8 +427,8 @@ rt_inline const struct pin_irq_map *get_pin_irq_map(uint32_t pinbit)
     return &pin_irq_map[mapindex];
 };
 
-static rt_err_t stm32_pin_attach_irq(struct rt_device *device, rt_int32_t pin,
-                                     rt_uint32_t mode, void (*hdr)(void *args), void *args)
+static rt_err_t stm32_pin_attach_irq(struct rt_device *device, rt_base_t pin,
+                                     rt_uint8_t mode, void (*hdr)(void *args), void *args)
 {
     const struct pin_index *index;
     rt_base_t level;
@@ -501,7 +501,7 @@ static rt_err_t stm32_pin_dettach_irq(struct rt_device *device, rt_int32_t pin)
 }
 
 static rt_err_t stm32_pin_irq_enable(struct rt_device *device, rt_base_t pin,
-                                     rt_uint32_t enabled)
+                                     rt_uint8_t enabled)
 {
     const struct pin_index *index;
     const struct pin_irq_map *irqmap;
@@ -755,6 +755,21 @@ void EXTI15_10_IRQHandler(void)
     rt_interrupt_leave();
 }
 #endif
+/* Back-light control pin */
+void lcd_pwm_pin_init(void)
+{
+    GPIO_InitTypeDef gpio_init_structure = {0};
+     /* LCD_BL_CTRL GPIO configuration */
+     __HAL_RCC_GPIOA_CLK_ENABLE();
+
+     // LCD_PWM/PA8 (backlight control)
+     gpio_init_structure.Mode = GPIO_MODE_AF_PP;
+     gpio_init_structure.Pull = GPIO_NOPULL;
+     gpio_init_structure.Speed = GPIO_SPEED_FREQ_LOW;
+     gpio_init_structure.Alternate = GPIO_AF1_TIM1;
+     gpio_init_structure.Pin = GPIO_PIN_8;
+     HAL_GPIO_Init(GPIOA, &gpio_init_structure);
+}
 
 int rt_hw_pin_init(void)
 {
@@ -804,7 +819,7 @@ int rt_hw_pin_init(void)
 #if defined(__HAL_RCC_GPIOK_CLK_ENABLE)
     __HAL_RCC_GPIOK_CLK_ENABLE();
 #endif
-
+    lcd_pwm_pin_init();
     return rt_device_pin_register("pin", &_stm32_pin_ops, RT_NULL);
 }
 

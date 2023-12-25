@@ -63,6 +63,21 @@ void system_clock_config(int target_freq_mhz)
     {
         Error_Handler();
     }
+
+    /*activate CSI clock mondatory for I/O Compensation Cell*/
+     __HAL_RCC_CSI_ENABLE();
+
+     /* Enable SYSCFG clock mondatory for I/O Compensation Cell */
+     __HAL_RCC_SYSCFG_CLK_ENABLE();
+
+     /* Enables the I/O Compensation Cell */
+     HAL_EnableCompensationCell();
+
+     SCB->CPACR |=
+         ((3UL << 10 * 2) | (3UL << 11 * 2)); /* set CP10 and CP11 Full Access */
+
+     SystemCoreClockUpdate();
+
 }
 int clock_information(void)
 {

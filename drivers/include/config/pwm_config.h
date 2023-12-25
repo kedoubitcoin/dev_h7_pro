@@ -17,6 +17,15 @@
 extern "C" {
 #endif
 
+#ifdef BSP_USING_PWM1
+#define PWM1_CONFIG                             \
+    {                                           \
+       .tim_handle.Instance     = TIM1,         \
+       .name                    = "pwm1",       \
+       .channel                 = RT_NULL       \
+    }
+#endif /* BSP_USING_PWM1 */
+
 #ifdef BSP_USING_PWM2
 #ifndef PWM2_CONFIG
 #define PWM2_CONFIG                             \

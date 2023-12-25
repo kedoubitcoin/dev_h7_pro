@@ -12,6 +12,7 @@
 #define __BOARD_H__
 
 #include <stm32h7xx.h>
+#include "stm32h7xx_hal_tim.h"
 #include <drv_common.h>
 
 #ifdef __cplusplus
@@ -30,7 +31,7 @@ extern "C"
 /*-------------------------- ROM/RAM CONFIG BEGIN --------------------------*/
 
 #define ROM_START              ((uint32_t)0x08000000)
-#define ROM_SIZE               (1024 * 1024)
+#define ROM_SIZE               (2048 * 1024)
 #define ROM_END                ((uint32_t)(ROM_START + ROM_SIZE))
 
 #define RAM_START              (0x20000000)
@@ -169,7 +170,8 @@ extern "C"
  *
  */
 
-/*#define BSP_USING_PWM1*/
+#define BSP_USING_PWM1
+#define BSP_USING_PWM1_CH1
 /*#define BSP_USING_PWM2*/
 /*#define BSP_USING_PWM3*/
 
@@ -229,8 +231,10 @@ extern "C"
  *
  */
 
-/*#define BSP_USING_TIM*/
+#define BSP_USING_TIM
+
 #ifdef BSP_USING_TIM
+#define BSP_USING_TIM1
 /*#define BSP_USING_TIM15*/
 /*#define BSP_USING_TIM16*/
 /*#define BSP_USING_TIM17*/

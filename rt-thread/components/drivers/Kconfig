@@ -162,7 +162,7 @@ config RT_USING_RANDOM
 
 config RT_USING_PWM
     bool "Using PWM device drivers"
-    default n
+    default y
 
 config RT_USING_MTD_NOR
     bool "Using MTD Nor Flash device drivers"

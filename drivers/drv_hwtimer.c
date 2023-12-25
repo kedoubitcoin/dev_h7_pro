@@ -174,10 +174,13 @@ static void timer_init(struct rt_hwtimer_device *timer, rt_uint32_t state)
 #elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
         if (0)
 #endif
-        {
 #if !defined(SOC_SERIES_STM32F0) && !defined(SOC_SERIES_STM32G0)
-            prescaler_value = (uint32_t)(HAL_RCC_GetPCLK2Freq() * 2 / 10000) - 1;
+        if(1)
 #endif
+        {
+
+            prescaler_value = (uint32_t)(HAL_RCC_GetPCLK2Freq() * 2 / 10000) - 1;
+
         }
         else
         {
@@ -295,9 +298,9 @@ static rt_err_t timer_ctrl(rt_hwtimer_t *timer, rt_uint32_t cmd, void *arg)
 #elif defined(SOC_SERIES_STM32L4)
         if (tim->Instance == TIM15 || tim->Instance == TIM16 || tim->Instance == TIM17)
 #elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F0) || defined(SOC_SERIES_STM32G0)
-        if (0)
+
 #endif
-        {
+        if (1) {
 #if defined(SOC_SERIES_STM32L4)
             val = HAL_RCC_GetPCLK2Freq() / freq;
 #elif defined(SOC_SERIES_STM32F1) || defined(SOC_SERIES_STM32F2) || defined(SOC_SERIES_STM32F4) || defined(SOC_SERIES_STM32F7)
@@ -349,7 +352,16 @@ static const struct rt_hwtimer_ops _ops =
     .count_get = timer_counter_get,
     .control = timer_ctrl,
 };
-
+#ifdef BSP_USING_TIM1
+void TIM1_TRG_COM_IRQHandler(void)
+{
+    /* enter interrupt */
+    rt_interrupt_enter();
+    HAL_TIM_IRQHandler(&stm32_hwtimer_obj[TIM1_INDEX].tim_handle);
+    /* leave interrupt */
+    rt_interrupt_leave();
+}
+#endif
 #ifdef BSP_USING_TIM2
 void TIM2_IRQHandler(void)
 {

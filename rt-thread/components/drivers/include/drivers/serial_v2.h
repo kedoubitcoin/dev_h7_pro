@@ -181,7 +181,7 @@ struct rt_uart_ops
     rt_ssize_t (*transmit)(struct rt_serial_device       *serial,
                                  rt_uint8_t             *buf,
                                  rt_size_t               size,
-                                 rt_uint32_t             tx_flag);
+                                 int                     tx_flag);
 };
 
 void rt_hw_serial_isr(struct rt_serial_device *serial, int event);

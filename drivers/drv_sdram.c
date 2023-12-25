@@ -88,6 +88,8 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 }
 static int SDRAM_IO_Init(void)
 {
+    int result = RT_EOK;
+
     GPIO_InitTypeDef gpio_init_structure;
 
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
@@ -169,7 +171,10 @@ static int SDRAM_IO_Init(void)
                             GPIO_PIN_9 | GPIO_PIN_10;
 
     HAL_GPIO_Init(GPIOI, &gpio_init_structure);
+
+    return result;
 }
+
 static int SDRAM_Init(void)
 {
     int result = RT_EOK;
