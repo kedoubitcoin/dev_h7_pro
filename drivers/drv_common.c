@@ -74,6 +74,12 @@ void HAL_ResumeTick(void)
 
 void HAL_Delay(__IO uint32_t Delay)
 {
+    __IO uint64_t tmpmrd = 0;
+
+    /* interrupt is not enable, just to delay some time. */
+//    for (tmpmrd = 0; tmpmrd < (655*Delay); tmpmrd ++)
+    for (tmpmrd = 0; tmpmrd < (655*Delay); tmpmrd ++)
+        ;
 }
 
 /* re-implement tick interface for STM32 HAL */

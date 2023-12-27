@@ -23,7 +23,7 @@ static SDRAM_HandleTypeDef hsdram[1];
 static FMC_SDRAM_CommandTypeDef command;
 #define FMC_SDRAM_TIMEOUT ((uint32_t)0xFFFF)
 #ifdef RT_USING_MEMHEAP_AS_HEAP
-static struct rt_memheap system_heap;
+struct rt_memheap system_heap;
 #endif
 
 /**
@@ -297,6 +297,40 @@ int sdram_test(void)
 
     return RT_EOK;
 }
+void malloc_test(void)
+{
+    int size = 100 * 1024;  // 100KBytes
+    rt_uint8_t * ptr = RT_NULL;
+
+    ptr = rt_malloc(size);
+    if(ptr != RT_NULL)
+    {
+        LOG_D("ptr = %p", ptr); // 打印申请到的空间的首地址
+    }
+    else
+    {
+        LOG_E("malloc failed");
+    }
+}
+
+void sdram_malloc_test(void)
+{
+    int size = 100 * 1024;  // 100KBytes
+    uint8_t *ptr;
+
+    ptr = rt_memheap_alloc(&system_heap, size);
+    if(ptr != RT_NULL)
+    {
+        LOG_D("ptr = %p", ptr); // 打印申请到的空间的首地址
+    }
+    else
+    {
+        LOG_E("sdram malloc failed");
+    }
+}
+MSH_CMD_EXPORT(sdram_malloc_test, sdram malloc test)
+MSH_CMD_EXPORT(malloc_test, malloc test)
+
 MSH_CMD_EXPORT(sdram_test, sdram test)
 #endif /* FINSH_USING_MSH */
 #endif /* DRV_DEBUG */

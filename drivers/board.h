@@ -34,9 +34,17 @@ extern "C"
 #define ROM_SIZE               (2048 * 1024)
 #define ROM_END                ((uint32_t)(ROM_START + ROM_SIZE))
 
-#define RAM_START              (0x20000000)
+#define RAM_START              (0x30000000)
 #define RAM_SIZE               (128 * 1024)
 #define RAM_END                (RAM_START + RAM_SIZE)
+
+#define RAM2_START              (0x30020000)
+#define RAM2_SIZE               (128 * 1024)
+#define RAM2_END                (RAM2_START + RAM2_SIZE)
+
+#define RAM3_START              (0x30040000)
+#define RAM3_SIZE               (32 * 1024)
+#define RAM3_END                (RAM3_START + RAM3_SIZE)
 
 /*-------------------------- ROM/RAM CONFIG END --------------------------*/
 
@@ -53,7 +61,8 @@ extern "C"
 //#define SCB_EnableICache
 //#define SCB_EnableDCache
 #define BSP_USING_SDRAM
-
+//#define BSP_USING_LCD
+#define BSP_USING_LCD_MIPI
 /*--------------------------jjj CONFIG END------------------------------*/
 
 /*-------------------------- UART CONFIG BEGIN --------------------------*/

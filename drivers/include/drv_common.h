@@ -40,6 +40,14 @@ void _Error_Handler(char *s, int num);
 #define STM32_SRAM1_START              RAM_START
 #define STM32_SRAM1_END                RAM_END
 
+#define STMRE_SRAM2_SEZE               RAM2_SIZE
+#define STM32_SRAM2_START              RAM2_START
+#define STM32_SRAM2_END                RAM2_END
+
+#define STMRE_SRAM3_SEZE               RAM3_SIZE
+#define STM32_SRAM3_START              RAM3_START
+#define STM32_SRAM3_END                RAM3_END
+
 #if defined(__CC_ARM) || defined(__CLANG_ARM)
 extern int Image$RW_IRAM1$ZI$Limit;
 #define HEAP_BEGIN      ((void *)&Image$RW_IRAM1$ZI$Limit)

@@ -15,6 +15,7 @@
 #ifdef RT_USING_PIN
 
 #include <rtdevice.h>
+#include "lcd_port.h"
 
 #define __STM32_PIN(index, gpio, gpio_index)                                \
     {                                                                       \
@@ -759,17 +760,18 @@ void EXTI15_10_IRQHandler(void)
 void lcd_pwm_pin_init(void)
 {
     GPIO_InitTypeDef gpio_init_structure = {0};
-     /* LCD_BL_CTRL GPIO configuration */
-     __HAL_RCC_GPIOA_CLK_ENABLE();
+    /* LCD_BL_CTRL GPIO configuration */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
 
-     // LCD_PWM/PA8 (backlight control)
-     gpio_init_structure.Mode = GPIO_MODE_AF_PP;
-     gpio_init_structure.Pull = GPIO_NOPULL;
-     gpio_init_structure.Speed = GPIO_SPEED_FREQ_LOW;
-     gpio_init_structure.Alternate = GPIO_AF1_TIM1;
-     gpio_init_structure.Pin = GPIO_PIN_8;
-     HAL_GPIO_Init(GPIOA, &gpio_init_structure);
+    // LCD_PWM/PA8 (backlight control)
+    gpio_init_structure.Mode = GPIO_MODE_AF_PP;
+    gpio_init_structure.Pull = GPIO_NOPULL;
+    gpio_init_structure.Speed = GPIO_SPEED_FREQ_LOW;
+    gpio_init_structure.Alternate = GPIO_AF1_TIM1;
+    gpio_init_structure.Pin = GPIO_PIN_8;
+    HAL_GPIO_Init(GPIOA, &gpio_init_structure);
 }
+
 
 int rt_hw_pin_init(void)
 {
@@ -819,6 +821,8 @@ int rt_hw_pin_init(void)
 #if defined(__HAL_RCC_GPIOK_CLK_ENABLE)
     __HAL_RCC_GPIOK_CLK_ENABLE();
 #endif
+//    lcd_mipi_pin_init();
+
     lcd_pwm_pin_init();
     return rt_device_pin_register("pin", &_stm32_pin_ops, RT_NULL);
 }

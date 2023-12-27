@@ -268,7 +268,7 @@ static rt_err_t drv_pwm_control(struct rt_device_pwm *device, int cmd, void *arg
     }
 }
 
-#define LED_PWM_TIM_PERIOD (200)
+#define LED_PWM_TIM_PERIOD (10)
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim)
 {
     if(htim->Instance == TIM1)
@@ -381,7 +381,7 @@ static rt_err_t stm32_hw_pwm_init(struct stm32_pwm *device)
 //    __HAL_TIM_URS_ENABLE(tim);
 
     HAL_TIM_PWM_Start(tim, TIM_CHANNEL_1);
-    HAL_TIMEx_PWMN_Start(tim,TIM_CHANNEL_1);
+//    HAL_TIMEx_PWMN_Start(tim,TIM_CHANNEL_1);
 
 __exit:
     return result;
