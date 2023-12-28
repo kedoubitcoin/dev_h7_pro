@@ -317,16 +317,6 @@ void st7701_init_sequence(void) {
     st7701_dsi(0xff, 0x77, 0x01, 0x00, 0x00, 0x10);
 
     st7701_dsi(0xe5, 0x00, 0x00);
-
-    // //test lcd only
-
-     st7701_dsi(0xff,0x77,0x01,0x00,0x00,0x12);
-
-     st7701_dsi(0xd1,0x81);
-
-     st7701_dsi(0xd2,0x00);
-//
-//    // //end test lcd
 }
 
 void ltdc_layer_init(uint16_t index, uint32_t framebuffer)
@@ -538,6 +528,16 @@ int lcd_test(void)
 {
 
     rt_kprintf("start lcd test ...\n");
+    //test lcd only
+
+    st7701_dsi(0xff,0x77,0x01,0x00,0x00,0x12);
+
+    st7701_dsi(0xd1,0x81);
+
+    st7701_dsi(0xd2,0x00);
+
+    //end test lcd
+
 //    struct drv_lcd_device *lcd;
 //    lcd = (struct drv_lcd_device *)rt_device_find("lcd");
 
