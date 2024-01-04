@@ -104,10 +104,14 @@ extern "C"
  *                             #define BSP_I2C1_SDA_PIN    GET_PIN(port, pin)   ->   GET_PIN(C, 12)
  */
 
-/*#define BSP_USING_I2C1*/
+#define BSP_USING_I2C1
 #ifdef BSP_USING_I2C1
-#define BSP_I2C1_SCL_PIN    GET_PIN(port, pin)
-#define BSP_I2C1_SDA_PIN    GET_PIN(port, pin)
+#define BSP_I2C1_SCL_PIN    GET_PIN(B, 6)
+#define BSP_I2C1_SDA_PIN    GET_PIN(B, 7)
+
+#define GT911_RST_PIN       GET_PIN(G, 3)
+#define LCD_TE_PIN          GET_PIN(J, 2)
+
 #endif
 
 /*#define BSP_USING_I2C2*/

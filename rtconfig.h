@@ -95,8 +95,12 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
+#define RT_USING_I2C
+#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_PWM
+#define RT_USING_TOUCH
+#define RT_TOUCH_PIN_IRQ
 #define RT_USING_LCD
 
 /* Using USB */
@@ -190,6 +194,12 @@
 
 /* LVGL: powerful and easy-to-use embedded GUI library */
 
+#define PKG_USING_LVGL
+#define PKG_LVGL_THREAD_PRIO 20
+#define PKG_LVGL_THREAD_STACK_SIZE 4096
+#define PKG_LVGL_DISP_REFR_PERIOD 5
+#define PKG_LVGL_USING_V080311
+#define PKG_LVGL_VER_NUM 0x080311
 /* end of LVGL: powerful and easy-to-use embedded GUI library */
 
 /* u8g2: a monochrome graphic library */
@@ -228,6 +238,8 @@
 
 /* touch drivers */
 
+#define PKG_USING_GT911
+#define PKG_USING_GT911_LATEST_VERSION
 /* end of touch drivers */
 
 /* Kendryte SDK */

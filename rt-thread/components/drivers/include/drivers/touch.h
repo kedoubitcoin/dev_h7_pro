@@ -13,6 +13,7 @@
 
 #include <rtthread.h>
 #include "pin.h"
+#include "gt911.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,6 +24,9 @@ extern "C" {
 #else
 #define  rt_touch_get_ts()  rt_tick_get()          /* API for the touch to get the timestamp */
 #endif
+
+//#define GT911_IRQ_PIN GET_PIN(GPIOA,GPIO_PIN_2)
+//#define GT911_RST_PIN GET_PIN(GPIOC,GPIO_PIN_1)
 
 /* Touch vendor types */
 #define RT_TOUCH_VENDOR_UNKNOWN          (0)  /* unknown */

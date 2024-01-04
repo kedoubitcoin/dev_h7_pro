@@ -24,15 +24,21 @@ DSI_HandleTypeDef   hdsi;
 DSI_VidCfgTypeDef   hdsi_video;
 LTDC_HandleTypeDef  hltdc;
 ///////////////////////////////
-//LCD_PARAMS lcd_params;
+LCD_PARAMS lcd_params;
 
 DMA2D_HandleTypeDef hlcd_dma2d;
+
 LCD_TIME_SEQUENCE lcd_time_seq = {.hsync = ST7701S_480X800_HSYNC,
                                   .hfp = ST7701S_480X800_HFP,
                                   .hbp = ST7701S_480X800_HBP,
                                   .vsync = ST7701S_480X800_VSYNC,
                                   .vfp = ST7701S_480X800_VFP,
                                   .vbp = ST7701S_480X800_VBP};
+
+#define CONVERTRGB5652ARGB8888(Color)                                   \
+  ((((((((Color) >> (11U)) & 0x1FU) * 527U) + 23U) >> (6U)) << (16U)) | \
+   (((((((Color) >> (5U)) & 0x3FU) * 259U) + 33U) >> (6U)) << (8U)) |   \
+   (((((Color)&0x1FU) * 527U) + 23U) >> (6U)) | (0xFF000000U))
 
 struct stm32_lcd
 {
@@ -42,8 +48,65 @@ struct stm32_lcd
 struct stm32_lcd lcd;
 
 
-extern void stm32_mipi_display_on(void);
-extern void stm32_mipi_display_off(void);
+static void fb_fill_buffer(uint32_t *dest, uint32_t x_size, uint32_t y_size,
+                           uint32_t offset, uint32_t color) {
+  uint32_t output_color_mode, input_color = color;
+
+  switch (lcd_params.pixel_format) {
+    case LTDC_PIXEL_FORMAT_RGB565:
+      output_color_mode = DMA2D_OUTPUT_RGB565; /* RGB565 */
+      input_color = CONVERTRGB5652ARGB8888(color);
+      break;
+    case LTDC_PIXEL_FORMAT_RGB888:
+    default:
+      output_color_mode = DMA2D_OUTPUT_ARGB8888; /* ARGB8888 */
+      break;
+  }
+
+  /* Register to memory mode with ARGB8888 as color Mode */
+  hlcd_dma2d.Init.Mode = DMA2D_R2M;
+  hlcd_dma2d.Init.ColorMode = output_color_mode;
+  hlcd_dma2d.Init.OutputOffset = offset;
+
+  hlcd_dma2d.Instance = DMA2D;
+
+  /* DMA2D Initialization */
+  if (HAL_DMA2D_Init(&hlcd_dma2d) == HAL_OK) {
+    if (HAL_DMA2D_ConfigLayer(&hlcd_dma2d, 1) == HAL_OK) {
+      if (HAL_DMA2D_Start(&hlcd_dma2d, input_color, (uint32_t)dest, x_size,
+                          y_size) == HAL_OK) {
+        /* Polling For DMA transfer */
+        (void)HAL_DMA2D_PollForTransfer(&hlcd_dma2d, 25);
+      }
+    }
+  }
+}
+
+void fb_fill_rect(uint32_t x_pos, uint32_t y_pos, uint32_t width,
+                  uint32_t height, uint32_t color) {
+  /* Get the rectangle start address */
+  uint32_t address = lcd_params.fb_base +
+                     ((lcd_params.bbp) * (lcd_params.xres * y_pos + x_pos));
+
+  /* Fill the rectangle */
+  fb_fill_buffer((uint32_t *)address, width, height, (lcd_params.xres - width),
+                 color);
+}
+
+void fb_draw_hline(uint32_t x_pos, uint32_t y_pos, uint32_t len,
+                   uint32_t color) {
+  uint32_t address = lcd_params.fb_base +
+                     ((lcd_params.bbp) * (lcd_params.xres * y_pos + x_pos));
+  fb_fill_buffer((uint32_t *)address, len, 1, 0, color);
+}
+
+void fb_draw_vline(uint32_t x_pos, uint32_t y_pos, uint32_t len,
+                   uint32_t color) {
+  uint32_t address = lcd_params.fb_base +
+                     ((lcd_params.bbp) * (lcd_params.xres * y_pos + x_pos));
+  fb_fill_buffer((uint32_t *)address, 1, len, lcd_params.xres - 1, color);
+}
+
 
 static void ltcd_msp_init(LTDC_HandleTypeDef *hltdc) {
   if (hltdc->Instance == LTDC) {
@@ -379,9 +442,7 @@ void lcd_mipi_pin_init(void)
 rt_err_t ltdc_init(uint32_t framebuffer)
 {
     uint32_t pixel_format;
-    uint32_t  dsi_pixel_format;
-
-    rt_kprintf("lcd init 1 ...\n");
+    uint32_t  dsi_pixel_format,ltdc_pixel_format;
 
     __HAL_RCC_LTDC_FORCE_RESET();
     __HAL_RCC_LTDC_RELEASE_RESET();
@@ -394,10 +455,19 @@ rt_err_t ltdc_init(uint32_t framebuffer)
     pixel_format = LCD_PIXEL_FORMAT_RGB565;
 
     if (pixel_format == LCD_PIXEL_FORMAT_RGB565) {
+        ltdc_pixel_format = LTDC_PIXEL_FORMAT_RGB565;
         dsi_pixel_format = DSI_RGB565;
+        lcd_params.bbp = 2;
     } else {
+        ltdc_pixel_format = LCD_PIXEL_FORMAT_ARGB8888;
         dsi_pixel_format = DSI_RGB888;
+        lcd_params.bbp = 4;
     }
+
+    lcd_params.pixel_format = ltdc_pixel_format;
+    lcd_params.xres = LCD_WIDTH;
+    lcd_params.yres = LCD_HEIGHT;
+    lcd_params.fb_base = framebuffer;
 
     /* Initializes peripherals instance value */
     hltdc.Instance = LTDC;
@@ -446,10 +516,9 @@ static rt_err_t stm32_lcd_init(rt_device_t device)
     lcd.info.pixel_format   = RTGRAPHIC_PIXEL_FORMAT_RGB565;
     lcd.info.bits_per_pixel = 16;
 //    lcd.info.framebuffer    = (void *)rt_malloc_align(LCD_WIDTH * LCD_HEIGHT * (lcd.info.bits_per_pixel / 8), 32);
-
     lcd.info.framebuffer  =  (rt_uint8_t *)rt_memheap_alloc(&system_heap, LCD_WIDTH * LCD_HEIGHT * (lcd.info.bits_per_pixel / 8));
 
-    memset(lcd.info.framebuffer, 0, LCD_WIDTH * LCD_HEIGHT * (lcd.info.bits_per_pixel / 8));
+    memset(lcd.info.framebuffer, 0xa5, LCD_WIDTH * LCD_HEIGHT * (lcd.info.bits_per_pixel / 8));
     ltdc_init((uint32_t)lcd.info.framebuffer);
 //    ltdc_layer_init(0, (uint32_t)lcd.info.framebuffer);
 
@@ -520,6 +589,9 @@ rt_weak void stm32_mipi_display_on(void)
 rt_weak void stm32_mipi_display_off(void)
 {
     rt_kprintf("please Implementation function %s\n", __func__);
+
+    extern void display_clear(void);
+    display_clear();
 }
 
 #ifdef DRV_DEBUG
@@ -530,13 +602,16 @@ int lcd_test(void)
     rt_kprintf("start lcd test ...\n");
     //test lcd only
 
-    st7701_dsi(0xff,0x77,0x01,0x00,0x00,0x12);
-
-    st7701_dsi(0xd1,0x81);
-
-    st7701_dsi(0xd2,0x00);
+//    st7701_dsi(0xff,0x77,0x01,0x00,0x00,0x12);
+//
+//    st7701_dsi(0xd1,0x81);
+//
+//    st7701_dsi(0xd2,0x00);
 
     //end test lcd
+
+    extern void display_clear(void);
+    display_clear();
 
 //    struct drv_lcd_device *lcd;
 //    lcd = (struct drv_lcd_device *)rt_device_find("lcd");

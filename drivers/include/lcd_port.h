@@ -10,6 +10,12 @@
 
 #ifndef __LCD_PORT_H__
 #define __LCD_PORT_H__
+#include <stdint.h>
+
+#define LCD_BACKLIGHT_USING_PWM
+#define LCD_PWM_DEV_NAME    "pwm1"
+#define LCD_PWM_DEV_CHANNEL 1
+/* 3.1 inch screen, 800 * 480 */
 
 /* LCD reset pin */
 #define LCD_RESET_PIN GPIO_PIN_3
@@ -23,7 +29,7 @@
 
 /* armfly 5 inch screen, 800 * 480 */
 #define LCD_WIDTH           480
-#define LCD_HEIGHT          800
+#define LCD_HEIGHT          1600
 #define LCD_BITS_PER_PIXEL  16
 #define LCD_BUF_SIZE        (LCD_WIDTH * LCD_HEIGHT * LCD_BITS_PER_PIXEL / 8)
 #define LCD_PIXEL_FORMAT    RTGRAPHIC_PIXEL_FORMAT_RGB565
@@ -79,9 +85,18 @@ typedef struct time_sequence {
   int vfp;
 } LCD_TIME_SEQUENCE;
 
-#define LCD_BACKLIGHT_USING_PWM
-#define LCD_PWM_DEV_NAME    "pwm1"
-#define LCD_PWM_DEV_CHANNEL 1
-/* armfly 5 inch screen, 800 * 480 */
+extern void fb_fill_rect(uint32_t x_pos, uint32_t y_pos, uint32_t width,
+        uint32_t height, uint32_t color);
+
+extern void fb_write_pixel(uint32_t x_pos, uint32_t y_pos, uint32_t color);
+extern void fb_fill_rect(uint32_t x_pos, uint32_t y_pos, uint32_t width,
+                  uint32_t height, uint32_t color);
+extern void fb_draw_hline(uint32_t x_pos, uint32_t y_pos, uint32_t len,
+                   uint32_t color);
+extern void fb_draw_vline(uint32_t x_pos, uint32_t y_pos, uint32_t len,
+                   uint32_t color);
+
+extern void stm32_mipi_display_on(void);
+extern void stm32_mipi_display_off(void);
 
 #endif /* __LCD_PORT_H__ */
