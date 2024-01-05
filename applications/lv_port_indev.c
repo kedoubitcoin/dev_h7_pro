@@ -11,9 +11,10 @@
  *********************/
 #include "lv_port_indev.h"
 #include "lvgl.h"
-#include "touch.h"
+//#include "touch.h"
 #include <drv_log.h>
 #include <board.h>
+#include "touch.h"
 /*********************
  *      DEFINES
  *********************/
@@ -31,10 +32,12 @@ static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static bool touchpad_is_pressed(void);
 static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y);
 
+#if 0
 static void button_init(void);
 static void button_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static int8_t button_get_pressed_id(void);
 static bool button_is_pressed(uint8_t id);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -88,7 +91,7 @@ void lv_port_indev_init(void)
     /*------------------
      * Button
      * -----------------*/
-
+#if 0
     /*Initialize your button if you have*/
     button_init();
 
@@ -104,6 +107,7 @@ void lv_port_indev_init(void)
         {40, 100},  /*Button 1 -> x:40; y:100*/
     };
     lv_indev_set_button_points(indev_button, btn_points);
+#endif
 }
 
 /**********************
@@ -239,7 +243,7 @@ static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
 /*------------------
  * Button
  * -----------------*/
-
+#if 0
 /*Initialize your buttons*/
 static void button_init(void)
 {
@@ -292,7 +296,7 @@ static bool button_is_pressed(uint8_t id)
 
     return false;
 }
-
+#endif
 
 
 //INIT_ENV_EXPORT(rt_hw_gt911_port);
